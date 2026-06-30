@@ -46,7 +46,7 @@ server:
         secret: ""
         verify-url: https://challenges.cloudflare.com/turnstile/v0/siteverify
   http:
-    listen: :40318
+    listen: :40319
     web-root: ${WEB_ROOT:-dist}
     session-ttl: 168h
     trusted-proxies: []

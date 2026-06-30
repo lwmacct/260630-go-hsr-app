@@ -49,7 +49,7 @@ func (m *AuthModule) Register(api huma.API) {
 	m.value.Register(api)
 }
 
-func (m *AuthModule) UserByID(ctx context.Context, id int64) (*auth.User, error) {
+func (m *AuthModule) UserByID(ctx context.Context, id string) (*auth.User, error) {
 	return m.value.UserByID(ctx, id)
 }
 
@@ -57,7 +57,7 @@ func (m *AuthModule) CreateExternalUser(ctx context.Context, input auth.External
 	return m.value.CreateExternalUser(ctx, input)
 }
 
-func (m *AuthModule) CreateSession(ctx context.Context, userID int64, request auth.SessionRequest) (*auth.Session, error) {
+func (m *AuthModule) CreateSession(ctx context.Context, userID string, request auth.SessionRequest) (*auth.Session, error) {
 	return m.value.CreateSession(ctx, userID, request)
 }
 

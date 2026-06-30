@@ -158,7 +158,7 @@ func DefaultConfig() Config {
 				},
 			},
 			HTTP: ServerHTTP{
-				Listen:  ":40318",
+				Listen:  ":40319",
 				WebRoot: "${WEB_ROOT:-dist}",
 				TLS: tlsreload.Config{
 					Enabled:      false,

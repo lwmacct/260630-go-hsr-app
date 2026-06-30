@@ -10,6 +10,7 @@ import (
 	"github.com/lwmacct/260630-go-hsr-auth/pkg/auth"
 	"github.com/lwmacct/260630-go-hsr-shared/pkg/appmodule"
 	"github.com/lwmacct/260630-go-hsr-shared/pkg/database"
+	"github.com/lwmacct/260630-go-hsr-shared/pkg/idgen"
 	"github.com/uptrace/bun"
 )
 
@@ -165,11 +166,12 @@ func createTestSession(t *testing.T, deps *dependencies, username string, role s
 	return session.ID
 }
 
-func createTestUser(t *testing.T, deps *dependencies, username string, role string) int64 {
+func createTestUser(t *testing.T, deps *dependencies, username string, role string) string {
 	t.Helper()
 
 	now := time.Now().UTC()
 	user := authUserRow{
+		ID:          idgen.NewUUID7(),
 		Username:    username,
 		DisplayName: username,
 		Role:        role,
@@ -202,7 +204,7 @@ func authRequest() auth.SessionRequest {
 type authUserRow struct {
 	bun.BaseModel `bun:"table:users"`
 
-	ID          int64     `bun:"id,pk,autoincrement"`
+	ID          string    `bun:"id,pk,type:uuid"`
 	Username    string    `bun:"username,notnull,unique"`
 	DisplayName string    `bun:"display_name,notnull"`
 	Role        string    `bun:"role,notnull"`
