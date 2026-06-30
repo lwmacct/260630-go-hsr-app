@@ -32,5 +32,5 @@
     "typecheck": "tsc -p tsconfig.app.json --noEmit \u0026\u0026 tsc -p tsconfig.node.json --noEmit"
   },
   "type": "module",
-  "version": "0.5.260630"
+  "version": "0.6.260630"
 }
