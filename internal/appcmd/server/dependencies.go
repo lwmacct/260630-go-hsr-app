@@ -61,7 +61,7 @@ func newDependenciesWithoutTLS(ctx context.Context, cfg *config.Config) (*depend
 	authModule, err := auth.New(auth.Options{
 		DB:         db,
 		Config:     newAuthConfig(cfg),
-		SessionTTL: cfg.Server.HTTP.SessionTTL,
+		SessionTTL: cfg.Server.Auth.Session.TTL,
 	})
 	if err != nil {
 		_ = db.Close()

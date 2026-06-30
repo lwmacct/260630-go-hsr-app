@@ -50,10 +50,10 @@ github.com/lwmacct/260614-go-pkg-tlsreload v0.12.260630 h1:BvElHMXSdc0+nG2eFDDry
 github.com/lwmacct/260614-go-pkg-tlsreload v0.12.260630/go.mod h1:KnXgj11ww878gPmn2MphtbQsV+VH/t0ZoP9QzUgSIOc=
 github.com/lwmacct/260630-go-hsr-audit v0.4.260630 h1:bnKgpOpQYK3RhzegAeuwA9vdVpp2m8zO1rZScL7ciNY=
 github.com/lwmacct/260630-go-hsr-audit v0.4.260630/go.mod h1:njaA7myTH3SeJUKV7S5CqGZZkxcMmyHh9oPU7xsYOO8=
-github.com/lwmacct/260630-go-hsr-auth v0.3.260630 h1:59mJRdvPnYuhQw/H9693P7e/5tYcNXeCtOSAVZLmzNo=
-github.com/lwmacct/260630-go-hsr-auth v0.3.260630/go.mod h1:O8Ed6DdtZRA5BxX06X2vda560bVf4j76W+eNSwwG+Tk=
-github.com/lwmacct/260630-go-hsr-shared v0.2.260630 h1:D5dkSoZPqV31NAxKsX9+xzm22tkkhVXz3QWL68djrK4=
-github.com/lwmacct/260630-go-hsr-shared v0.2.260630/go.mod h1:fn3VoHk5V7VnKiqdu9rsc4ZJtoKFTdjrAEWSreSozPE=
+github.com/lwmacct/260630-go-hsr-auth v0.5.260630 h1:AhwbnZiTgyJ+rgiBnGQnQrc/M1tNlDRxVkFmgszI51k=
+github.com/lwmacct/260630-go-hsr-auth v0.5.260630/go.mod h1:S/d/WDp9OVyH4CjsyP4LvujHvujix5zOwVOZnrpYLoE=
+github.com/lwmacct/260630-go-hsr-shared v0.4.260630 h1:CeG+lS/fA1P50ZnMQfkKV60DUa+SD9hgL61+dwmding=
+github.com/lwmacct/260630-go-hsr-shared v0.4.260630/go.mod h1:VcVSXaPNCeZ5v2JPyNGtRp7m+NU8jYISN+vVCqhFrMo=
 github.com/mattn/go-isatty v0.0.21 h1:xYae+lCNBP7QuW4PUnNG61ffM4hVIfm+zUzDuSzYLGs=
 github.com/mattn/go-isatty v0.0.21/go.mod h1:ZXfXG4SQHsB/w3ZeOYbR0PrPwLy+n6xiMrJlRFqopa4=
 github.com/mattn/go-sqlite3 v1.14.34 h1:3NtcvcUnFBPsuRcno8pUtupspG/GM+9nZ88zgJcp6Zk=

@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/lwmacct/260630-go-hsr-auth/pkg/auth"
+	"github.com/lwmacct/260630-go-hsr-shared/pkg/challenge"
 
 	"github.com/lwmacct/260630-go-hsr-app/internal/config"
 )
@@ -21,9 +22,12 @@ func newAuthConfig(cfg *config.Config) auth.Config {
 			CallbackBaseURL: cfg.Server.Auth.OAuth.CallbackBaseURL,
 			Providers:       enabledOAuthProviders(cfg),
 		},
-		HTTP: auth.HTTPConfig{
-			TLSEnabled:    cfg.Server.HTTP.TLS.Enabled,
-			SecureCookies: cfg.Server.HTTP.TLS.Enabled,
+		Session: auth.SessionConfig{
+			Cookie: auth.SessionCookieConfig{
+				Name:   cfg.Server.Auth.Session.Cookie.Name,
+				Path:   cfg.Server.Auth.Session.Cookie.Path,
+				Secure: cfg.Server.Auth.Session.Cookie.Secure,
+			},
 		},
 		RuntimeAdmins:     cfg.Server.Auth.Admins,
 		Request:           auth.RequestFromContext,
@@ -76,11 +80,11 @@ func oauthClientConfig(cfg config.ServerAuthOAuthProvider) auth.OAuthClientConfi
 	}
 }
 
-func newChallengeProvider(cfg config.ServerAuthChallenge) auth.ChallengeProvider {
+func newChallengeProvider(cfg config.ServerAuthChallenge) challenge.Provider {
 	switch cfg.Provider {
-	case auth.ChallengeProviderHCaptcha:
-		provider, err := auth.NewRemoteTokenChallengeProvider(
-			auth.ChallengeProviderHCaptcha,
+	case challenge.ProviderHCaptcha:
+		provider, err := challenge.NewRemoteTokenProvider(
+			challenge.ProviderHCaptcha,
 			cfg.HCaptcha.SiteKey,
 			cfg.HCaptcha.Secret,
 			cfg.HCaptcha.VerifyURL,
@@ -88,9 +92,9 @@ func newChallengeProvider(cfg config.ServerAuthChallenge) auth.ChallengeProvider
 		if err == nil {
 			return provider
 		}
-	case auth.ChallengeProviderTurnstile:
-		provider, err := auth.NewRemoteTokenChallengeProvider(
-			auth.ChallengeProviderTurnstile,
+	case challenge.ProviderTurnstile:
+		provider, err := challenge.NewRemoteTokenProvider(
+			challenge.ProviderTurnstile,
 			cfg.Turnstile.SiteKey,
 			cfg.Turnstile.Secret,
 			cfg.Turnstile.VerifyURL,
@@ -99,5 +103,5 @@ func newChallengeProvider(cfg config.ServerAuthChallenge) auth.ChallengeProvider
 			return provider
 		}
 	}
-	return auth.NewImageChallengeProvider(cfg.Image.MaxChallenges)
+	return challenge.NewImageProvider(cfg.Image.MaxChallenges)
 }
