@@ -2,7 +2,6 @@ package server
 
 import (
 	"context"
-	"net/http"
 	"testing"
 
 	"github.com/lwmacct/260630-go-hsr-app/internal/config"
@@ -45,5 +44,4 @@ func TestNewHTTPAPIHandlerRegistersAllModules(t *testing.T) {
 	if handler == nil {
 		t.Fatal("api handler is nil")
 	}
-	_ = handler.(http.Handler)
 }
