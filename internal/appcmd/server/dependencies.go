@@ -7,9 +7,7 @@ import (
 
 	"github.com/lwmacct/260614-go-pkg-tlsreload/pkg/adapters/op"
 	"github.com/lwmacct/260614-go-pkg-tlsreload/pkg/tlsreload"
-	"github.com/lwmacct/260630-go-hsr-audit/pkg/audit"
-	"github.com/lwmacct/260630-go-hsr-auth/pkg/auth"
-	"github.com/lwmacct/260630-go-hsr-oauth/pkg/oauth"
+	"github.com/lwmacct/260630-go-hsr-shared/pkg/appmodule"
 	"github.com/lwmacct/260630-go-hsr-shared/pkg/database"
 	"github.com/lwmacct/260630-go-hsr-shared/pkg/requestctx"
 	"github.com/uptrace/bun"
@@ -19,9 +17,10 @@ import (
 
 type dependencies struct {
 	db       *bun.DB
-	auth     *auth.Module
-	oauth    *oauth.Module
-	audit    *audit.Module
+	modules  []appmodule.Module
+	auth     *AuthModule
+	oauth    *OauthModule
+	audit    *AuditModule
 	requests requestctx.Middleware
 	tls      *tlsreload.Manager
 }
@@ -51,46 +50,22 @@ func newDependenciesWithoutTLS(ctx context.Context, cfg *config.Config) (*depend
 	if err != nil {
 		return nil, fmt.Errorf("open database: %w", err)
 	}
-	if err := auth.ApplySchema(ctx, db); err != nil {
-		_ = db.Close()
-		return nil, fmt.Errorf("apply auth schema: %w", err)
-	}
-	if err := oauth.ApplySchema(ctx, db); err != nil {
-		_ = db.Close()
-		return nil, fmt.Errorf("apply oauth schema: %w", err)
-	}
-	if err := audit.ApplySchema(ctx, db); err != nil {
-		_ = db.Close()
-		return nil, fmt.Errorf("apply audit schema: %w", err)
-	}
 
-	authModule, err := auth.New(auth.Options{
-		DB:         db,
-		Config:     newAuthConfig(cfg),
-		SessionTTL: cfg.Server.Auth.Session.TTL,
-	})
-	if err != nil {
+	authModule := NewAuthModule(cfg)
+	oauthModule := NewOauthModule(cfg, authModule)
+	auditModule := NewAuditModule(authModule)
+	modules := []appmodule.Module{authModule, oauthModule, auditModule}
+	if err := appmodule.ApplySchemas(ctx, db, modules...); err != nil {
 		_ = db.Close()
-		return nil, fmt.Errorf("configure auth module: %w", err)
+		return nil, err
 	}
-	oauthModule, err := oauth.New(oauth.Options{
-		DB:     db,
-		Config: newOAuthConfig(cfg, authModule),
-	})
-	if err != nil {
+	if err := appmodule.Init(ctx, db, modules...); err != nil {
 		_ = db.Close()
-		return nil, fmt.Errorf("configure oauth module: %w", err)
-	}
-	auditModule, err := audit.New(audit.Options{
-		DB:              db,
-		AdminAuthorizer: newAuditAuthorizer(authModule),
-	})
-	if err != nil {
-		_ = db.Close()
-		return nil, fmt.Errorf("configure audit module: %w", err)
+		return nil, err
 	}
 	return &dependencies{
 		db:       db,
+		modules:  modules,
 		auth:     authModule,
 		oauth:    oauthModule,
 		audit:    auditModule,
@@ -113,6 +88,7 @@ func (d *dependencies) Close() {
 	d.auth = nil
 	d.oauth = nil
 	d.audit = nil
+	d.modules = nil
 }
 
 func databaseConfig(cfg config.ServerDatabase) database.Config {

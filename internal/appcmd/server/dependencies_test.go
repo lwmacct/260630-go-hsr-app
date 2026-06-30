@@ -52,7 +52,7 @@ func TestNewHTTPAPIHandlerRegistersAllModules(t *testing.T) {
 
 func TestAuditAuthorizerRejectsMissingSession(t *testing.T) {
 	deps := mustTestDependencies(t)
-	authorizer := newAuditAuthorizer(deps.auth)
+	authorizer := deps.audit.authorizer()
 
 	_, err := authorizer.RequireAdmin(authContext(), "")
 	if err == nil {
@@ -62,7 +62,7 @@ func TestAuditAuthorizerRejectsMissingSession(t *testing.T) {
 
 func TestAuditAuthorizerRejectsRegularUser(t *testing.T) {
 	deps := mustTestDependencies(t)
-	authorizer := newAuditAuthorizer(deps.auth)
+	authorizer := deps.audit.authorizer()
 	sessionID := createTestSession(t, deps, "regular-user", auth.UserRoleUser)
 
 	_, err := authorizer.RequireAdmin(authContext(), sessionID)
@@ -73,7 +73,7 @@ func TestAuditAuthorizerRejectsRegularUser(t *testing.T) {
 
 func TestAuditAuthorizerAllowsRoleAdmin(t *testing.T) {
 	deps := mustTestDependencies(t)
-	authorizer := newAuditAuthorizer(deps.auth)
+	authorizer := deps.audit.authorizer()
 	sessionID := createTestSession(t, deps, "role-admin", auth.UserRoleAdmin)
 
 	principal, err := authorizer.RequireAdmin(authContext(), sessionID)
@@ -89,7 +89,7 @@ func TestAuditAuthorizerAllowsRuntimeAdmin(t *testing.T) {
 	deps := mustTestDependencies(t, func(cfg *config.Config) {
 		cfg.Server.Auth.Admins = []string{"runtime-admin"}
 	})
-	authorizer := newAuditAuthorizer(deps.auth)
+	authorizer := deps.audit.authorizer()
 	sessionID := createTestSession(t, deps, "runtime-admin", auth.UserRoleUser)
 
 	principal, err := authorizer.RequireAdmin(authContext(), sessionID)

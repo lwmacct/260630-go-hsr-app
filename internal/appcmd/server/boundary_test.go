@@ -1,6 +1,7 @@
 package server
 
 import (
+	"go/ast"
 	"go/parser"
 	"go/token"
 	"os"
@@ -23,6 +24,29 @@ func TestFinalAppUsesModulePublicPackagesOnly(t *testing.T) {
 					t.Fatalf("final app must not import module internals: %s imports %s", file, importPath)
 				}
 			}
+		}
+	}
+}
+
+func TestServerModuleFilesDefineOneModuleStruct(t *testing.T) {
+	root := projectRoot(t)
+	files, err := filepath.Glob(filepath.Join(root, "internal", "appcmd", "server", "*.module.go"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(files) == 0 {
+		t.Fatal("no server module files found")
+	}
+	for _, file := range files {
+		structs := structNamesInFile(t, file)
+		var modules []string
+		for _, name := range structs {
+			if strings.HasSuffix(name, "Module") {
+				modules = append(modules, name)
+			}
+		}
+		if len(modules) != 1 {
+			t.Fatalf("%s must define exactly one *Module struct, got %v", file, modules)
 		}
 	}
 }
@@ -85,4 +109,26 @@ func importsInFile(t *testing.T, file string) []string {
 		imports = append(imports, strings.Trim(item.Path.Value, `"`))
 	}
 	return imports
+}
+
+func structNamesInFile(t *testing.T, file string) []string {
+	t.Helper()
+
+	fset := token.NewFileSet()
+	parsed, err := parser.ParseFile(fset, file, nil, 0)
+	if err != nil {
+		t.Fatal(err)
+	}
+	var names []string
+	ast.Inspect(parsed, func(node ast.Node) bool {
+		spec, ok := node.(*ast.TypeSpec)
+		if !ok {
+			return true
+		}
+		if _, ok := spec.Type.(*ast.StructType); ok {
+			names = append(names, spec.Name.Name)
+		}
+		return true
+	})
+	return names
 }

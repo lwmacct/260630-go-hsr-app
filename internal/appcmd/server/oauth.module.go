@@ -1,36 +1,76 @@
 package server
 
 import (
+	"context"
 	"errors"
 	"strings"
 
+	"github.com/danielgtaylor/huma/v2"
 	"github.com/lwmacct/260630-go-hsr-auth/pkg/auth"
 	"github.com/lwmacct/260630-go-hsr-oauth/pkg/oauth"
+	"github.com/lwmacct/260630-go-hsr-shared/pkg/appmodule"
+	"github.com/uptrace/bun"
 
 	"github.com/lwmacct/260630-go-hsr-app/internal/config"
 )
 
-func newOAuthConfig(cfg *config.Config, identity oauth.Identity) oauth.Config {
+type OauthModule struct {
+	cfg      *config.Config
+	identity oauth.Identity
+	value    *oauth.Module
+}
+
+var _ appmodule.Module = (*OauthModule)(nil)
+
+func NewOauthModule(cfg *config.Config, identity oauth.Identity) *OauthModule {
+	return &OauthModule{cfg: cfg, identity: identity}
+}
+
+func (m *OauthModule) Name() string {
+	return "oauth"
+}
+
+func (m *OauthModule) ApplySchema(ctx context.Context, db *bun.DB) error {
+	return oauth.ApplySchema(ctx, db)
+}
+
+func (m *OauthModule) Init(ctx context.Context, db *bun.DB) error {
+	module, err := oauth.New(oauth.Options{
+		DB:     db,
+		Config: m.config(),
+	})
+	if err != nil {
+		return err
+	}
+	m.value = module
+	return nil
+}
+
+func (m *OauthModule) Register(api huma.API) {
+	m.value.Register(api)
+}
+
+func (m *OauthModule) config() oauth.Config {
 	return oauth.Config{
-		Enabled:         cfg.Server.Auth.OAuth.Enabled,
-		AutoRegister:    cfg.Server.Auth.OAuth.AutoRegister,
-		CallbackBaseURL: cfg.Server.Auth.OAuth.CallbackBaseURL,
-		Providers:       enabledOAuthProviders(cfg),
+		Enabled:         m.cfg.Server.Auth.OAuth.Enabled,
+		AutoRegister:    m.cfg.Server.Auth.OAuth.AutoRegister,
+		CallbackBaseURL: m.cfg.Server.Auth.OAuth.CallbackBaseURL,
+		Providers:       m.enabledProviders(),
 		Request:         auth.RequestFromContext,
-		Identity:        identity,
-		Provider:        func(provider string) (oauth.Provider, error) { return oauthProvider(cfg, provider) },
+		Identity:        m.identity,
+		Provider:        func(provider string) (oauth.Provider, error) { return m.provider(provider) },
 	}
 }
 
-func enabledOAuthProviders(cfg *config.Config) []oauth.ProviderConfig {
-	if !cfg.Server.Auth.OAuth.Enabled {
+func (m *OauthModule) enabledProviders() []oauth.ProviderConfig {
+	if !m.cfg.Server.Auth.OAuth.Enabled {
 		return nil
 	}
 	providers := make([]oauth.ProviderConfig, 0, 2)
-	if oauthProviderEnabled(cfg.Server.Auth.OAuth.GitHub) {
+	if oauthProviderEnabled(m.cfg.Server.Auth.OAuth.GitHub) {
 		providers = append(providers, oauth.ProviderConfig{Provider: oauth.ProviderGitHub, Label: "GitHub"})
 	}
-	if oauthProviderEnabled(cfg.Server.Auth.OAuth.Google) {
+	if oauthProviderEnabled(m.cfg.Server.Auth.OAuth.Google) {
 		providers = append(providers, oauth.ProviderConfig{Provider: oauth.ProviderGoogle, Label: "Google"})
 	}
 	return providers
@@ -40,15 +80,15 @@ func oauthProviderEnabled(cfg config.ServerAuthOAuthProvider) bool {
 	return cfg.Enabled && cfg.ClientID != "" && cfg.ClientSecret != "" && cfg.AuthURL != "" && cfg.TokenURL != "" && cfg.UserInfoURL != ""
 }
 
-func oauthProvider(cfg *config.Config, provider string) (oauth.Provider, error) {
-	if !cfg.Server.Auth.OAuth.Enabled {
+func (m *OauthModule) provider(provider string) (oauth.Provider, error) {
+	if !m.cfg.Server.Auth.OAuth.Enabled {
 		return nil, errors.New("oauth disabled")
 	}
 	switch strings.ToLower(strings.TrimSpace(provider)) {
 	case oauth.ProviderGitHub:
-		return oauth.NewProvider(oauth.ProviderGitHub, oauthClientConfig(cfg.Server.Auth.OAuth.GitHub))
+		return oauth.NewProvider(oauth.ProviderGitHub, oauthClientConfig(m.cfg.Server.Auth.OAuth.GitHub))
 	case oauth.ProviderGoogle:
-		return oauth.NewProvider(oauth.ProviderGoogle, oauthClientConfig(cfg.Server.Auth.OAuth.Google))
+		return oauth.NewProvider(oauth.ProviderGoogle, oauthClientConfig(m.cfg.Server.Auth.OAuth.Google))
 	default:
 		return nil, errors.New("unsupported provider")
 	}
