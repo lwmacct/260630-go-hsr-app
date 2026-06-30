@@ -86,11 +86,12 @@ func (m *AuthModule) config() auth.Config {
 		},
 		RuntimeAdmins:     m.cfg.Server.Auth.Admins,
 		Request:           auth.RequestFromContext,
-		ChallengeProvider: newChallengeProvider(m.cfg.Server.Auth.Challenge),
+		ChallengeProvider: m.challengeProvider(),
 	}
 }
 
-func newChallengeProvider(cfg config.ServerAuthChallenge) challenge.Provider {
+func (m *AuthModule) challengeProvider() challenge.Provider {
+	cfg := m.cfg.Server.Auth.Challenge
 	switch cfg.Provider {
 	case challenge.ProviderHCaptcha:
 		provider, err := challenge.NewRemoteTokenProvider(

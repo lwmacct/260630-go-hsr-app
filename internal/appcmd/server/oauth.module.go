@@ -76,16 +76,16 @@ func (m *OauthModule) enabledProviders() []oauth.ProviderConfig {
 		return nil
 	}
 	providers := make([]oauth.ProviderConfig, 0, 2)
-	if oauthProviderEnabled(m.cfg.Server.Auth.OAuth.GitHub) {
+	if m.providerEnabled(m.cfg.Server.Auth.OAuth.GitHub) {
 		providers = append(providers, oauth.ProviderConfig{Provider: oauth.ProviderGitHub, Label: "GitHub"})
 	}
-	if oauthProviderEnabled(m.cfg.Server.Auth.OAuth.Google) {
+	if m.providerEnabled(m.cfg.Server.Auth.OAuth.Google) {
 		providers = append(providers, oauth.ProviderConfig{Provider: oauth.ProviderGoogle, Label: "Google"})
 	}
 	return providers
 }
 
-func oauthProviderEnabled(cfg config.ServerAuthOAuthProvider) bool {
+func (m *OauthModule) providerEnabled(cfg config.ServerAuthOAuthProvider) bool {
 	return cfg.Enabled && cfg.ClientID != "" && cfg.ClientSecret != "" && cfg.AuthURL != "" && cfg.TokenURL != "" && cfg.UserInfoURL != ""
 }
 
@@ -95,15 +95,15 @@ func (m *OauthModule) provider(provider string) (oauth.Provider, error) {
 	}
 	switch strings.ToLower(strings.TrimSpace(provider)) {
 	case oauth.ProviderGitHub:
-		return oauth.NewProvider(oauth.ProviderGitHub, oauthClientConfig(m.cfg.Server.Auth.OAuth.GitHub))
+		return oauth.NewProvider(oauth.ProviderGitHub, m.clientConfig(m.cfg.Server.Auth.OAuth.GitHub))
 	case oauth.ProviderGoogle:
-		return oauth.NewProvider(oauth.ProviderGoogle, oauthClientConfig(m.cfg.Server.Auth.OAuth.Google))
+		return oauth.NewProvider(oauth.ProviderGoogle, m.clientConfig(m.cfg.Server.Auth.OAuth.Google))
 	default:
 		return nil, errors.New("unsupported provider")
 	}
 }
 
-func oauthClientConfig(cfg config.ServerAuthOAuthProvider) oauth.ClientConfig {
+func (m *OauthModule) clientConfig(cfg config.ServerAuthOAuthProvider) oauth.ClientConfig {
 	return oauth.ClientConfig{
 		Enabled:      cfg.Enabled,
 		ClientID:     cfg.ClientID,
