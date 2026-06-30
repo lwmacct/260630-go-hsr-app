@@ -7,12 +7,9 @@ require (
 	github.com/lwmacct/251207-go-pkg-version v0.4.260630
 	github.com/lwmacct/251219-go-pkg-logm v0.9.260413
 	github.com/lwmacct/260614-go-pkg-tlsreload v0.12.260630
-	github.com/lwmacct/260630-go-hsr-auth v0.2.260630
+	github.com/lwmacct/260630-go-hsr-auth v0.3.260630
+	github.com/lwmacct/260630-go-hsr-shared v0.2.260630
 	github.com/uptrace/bun v1.2.18
-	github.com/uptrace/bun/dialect/pgdialect v1.2.18
-	github.com/uptrace/bun/dialect/sqlitedialect v1.2.18
-	github.com/uptrace/bun/driver/pgdriver v1.2.18
-	github.com/uptrace/bun/driver/sqliteshim v1.2.18
 	github.com/urfave/cli/v3 v3.10.1
 )
 
@@ -39,6 +36,10 @@ require (
 	github.com/tetratelabs/wabin v0.0.0-20230304001439-f6f874872834 // indirect
 	github.com/tetratelabs/wazero v1.12.0 // indirect
 	github.com/tmthrgd/go-hex v0.0.0-20190904060850-447a3041c3bc // indirect
+	github.com/uptrace/bun/dialect/pgdialect v1.2.18 // indirect
+	github.com/uptrace/bun/dialect/sqlitedialect v1.2.18 // indirect
+	github.com/uptrace/bun/driver/pgdriver v1.2.18 // indirect
+	github.com/uptrace/bun/driver/sqliteshim v1.2.18 // indirect
 	github.com/vmihailenco/msgpack/v5 v5.4.1 // indirect
 	github.com/vmihailenco/tagparser/v2 v2.0.0 // indirect
 	go.opentelemetry.io/otel v1.40.0 // indirect

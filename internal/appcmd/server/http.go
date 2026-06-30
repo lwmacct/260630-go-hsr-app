@@ -2,8 +2,9 @@ package server
 
 import (
 	"net/http"
-	"strings"
 	"time"
+
+	"github.com/lwmacct/260630-go-hsr-shared/pkg/httpserver"
 
 	"github.com/lwmacct/260630-go-hsr-final/internal/config"
 )
@@ -45,26 +46,5 @@ func newHTTPAPIHandler(cfg *config.Config, deps *dependencies) http.Handler {
 	if maxBodyBytes < 0 {
 		maxBodyBytes = 0
 	}
-	return limitRequestBody(deps.auth.Handler(), maxBodyBytes)
-}
-
-func limitRequestBody(next http.Handler, maxBytes int64) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if maxBytes > 0 && shouldLimitRequestBody(r) {
-			r.Body = http.MaxBytesReader(w, r.Body, maxBytes)
-		}
-		next.ServeHTTP(w, r)
-	})
-}
-
-func shouldLimitRequestBody(r *http.Request) bool {
-	if r.Method == http.MethodGet || r.Method == http.MethodHead || r.Body == nil || r.Body == http.NoBody {
-		return false
-	}
-	for _, value := range r.Header.Values("Upgrade") {
-		if strings.EqualFold(strings.TrimSpace(value), "websocket") {
-			return false
-		}
-	}
-	return true
+	return httpserver.LimitRequestBody(deps.auth.Handler(), maxBodyBytes)
 }

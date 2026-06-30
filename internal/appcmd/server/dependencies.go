@@ -8,16 +8,17 @@ import (
 	"github.com/lwmacct/260614-go-pkg-tlsreload/pkg/adapters/op"
 	"github.com/lwmacct/260614-go-pkg-tlsreload/pkg/tlsreload"
 	"github.com/lwmacct/260630-go-hsr-auth/pkg/auth"
+	"github.com/lwmacct/260630-go-hsr-shared/pkg/database"
+	"github.com/lwmacct/260630-go-hsr-shared/pkg/requestctx"
 	"github.com/uptrace/bun"
 
 	"github.com/lwmacct/260630-go-hsr-final/internal/config"
-	"github.com/lwmacct/260630-go-hsr-final/internal/infra/database"
 )
 
 type dependencies struct {
 	db       *bun.DB
 	auth     *auth.Module
-	requests requestContextMiddleware
+	requests requestctx.Middleware
 	tls      *tlsreload.Manager
 }
 
@@ -42,7 +43,7 @@ func newDependencies(ctx context.Context, cfg *config.Config) (*dependencies, er
 }
 
 func newDependenciesWithoutTLS(ctx context.Context, cfg *config.Config) (*dependencies, error) {
-	db, err := database.Open(ctx, cfg.Server.Database)
+	db, err := database.Open(ctx, databaseConfig(cfg.Server.Database))
 	if err != nil {
 		return nil, fmt.Errorf("open database: %w", err)
 	}
@@ -63,7 +64,7 @@ func newDependenciesWithoutTLS(ctx context.Context, cfg *config.Config) (*depend
 	return &dependencies{
 		db:       db,
 		auth:     module,
-		requests: newRequestContextMiddleware(cfg.Server.HTTP.TrustedProxies),
+		requests: requestctx.NewMiddleware(cfg.Server.HTTP.TrustedProxies),
 	}, nil
 }
 
@@ -80,4 +81,18 @@ func (d *dependencies) Close() {
 		d.db = nil
 	}
 	d.auth = nil
+}
+
+func databaseConfig(cfg config.ServerDatabase) database.Config {
+	return database.Config{
+		Type:   cfg.Type,
+		SQLite: cfg.SQLite,
+		PGSQL: database.PGSQLConfig{
+			Host:     cfg.PGSQL.Host,
+			Port:     cfg.PGSQL.Port,
+			User:     cfg.PGSQL.User,
+			Database: cfg.PGSQL.Database,
+			Password: cfg.PGSQL.Password,
+		},
+	}
 }
