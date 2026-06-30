@@ -1,0 +1,36 @@
+{
+  "dependencies": {
+    "@ant-design/icons": "^6.3.2",
+    "@lwmacct/260627-antd-workbench": "^0.35.260629",
+    "@tanstack/react-query": "^5.101.2",
+    "antd": "^6.5.0",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7",
+    "react-router-dom": "^7.18.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@types/node": "^26.0.1",
+    "@types/react": "^19.2.17",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^6.0.3",
+    "eslint": "^10.6.0",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "eslint-plugin-react-refresh": "^0.5.3",
+    "globals": "^17.7.0",
+    "typescript": "~6.0.3",
+    "typescript-eslint": "^8.62.0",
+    "vite": "^8.1.0"
+  },
+  "name": "app-web",
+  "private": true,
+  "scripts": {
+    "build": "vite build",
+    "dev": "vite",
+    "lint": "eslint .",
+    "preview": "vite preview",
+    "typecheck": "tsc -p tsconfig.app.json --noEmit \u0026\u0026 tsc -p tsconfig.node.json --noEmit"
+  },
+  "type": "module",
+  "version": "0.2.260630"
+}

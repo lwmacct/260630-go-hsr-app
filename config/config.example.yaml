@@ -1,0 +1,61 @@
+server:
+  database:
+    type: sqlite
+    sqlite: ${APP_DATA:-.local/data}/sqlite.db
+  auth:
+    admins:
+      - admin
+    local:
+      login-enabled: true
+      registration-enabled: true
+    oauth:
+      enabled: false
+      auto-register: true
+      callback-base-url: ""
+      github:
+        enabled: false
+        client-id: ""
+        client-secret: ""
+        scopes:
+          - read:user
+          - user:email
+        auth-url: https://github.com/login/oauth/authorize
+        token-url: https://github.com/login/oauth/access_token
+        userinfo-url: https://api.github.com/user
+      google:
+        enabled: false
+        client-id: ""
+        client-secret: ""
+        scopes:
+          - openid
+          - email
+          - profile
+        auth-url: https://accounts.google.com/o/oauth2/v2/auth
+        token-url: https://oauth2.googleapis.com/token
+        userinfo-url: https://openidconnect.googleapis.com/v1/userinfo
+    challenge:
+      provider: image
+      image:
+        max-challenges: 1024
+      hcaptcha:
+        sitekey: ""
+        secret: ""
+        verify-url: https://api.hcaptcha.com/siteverify
+      turnstile:
+        sitekey: ""
+        secret: ""
+        verify-url: https://challenges.cloudflare.com/turnstile/v0/siteverify
+  http:
+    listen: :40318
+    web-root: ${WEB_ROOT:-dist}
+    session-ttl: 168h
+    trusted-proxies: []
+    read-timeout: 30s
+    write-timeout: 30s
+    idle-timeout: 120s
+    max-api-body-bytes: 1048576
+    tls:
+      enabled: false
+      cert-file: ${APP_DATA:-.local/data}/ssl/fullchain.pem
+      key-file: ${APP_DATA:-.local/data}/ssl/privkey.pem
+      poll-interval: 3s

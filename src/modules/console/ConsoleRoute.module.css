@@ -1,0 +1,21 @@
+.page {
+  display: grid;
+  gap: 12px;
+}
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.header :global(.ant-typography) {
+  margin-top: 0;
+}
+
+@media (max-width: 640px) {
+  .header {
+    display: grid;
+  }
+}
