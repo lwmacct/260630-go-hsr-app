@@ -28,22 +28,18 @@ func NewAuditSpec() appmodule.Spec {
 		Requires:    []string{"auth"},
 		ApplySchema: module.ApplySchema,
 		Build: func(ctx *appmodule.Context) (appmodule.Module, error) {
-			return newAuditModule(ctx.Context(), ctx.DB(), appmodule.MustContextGet[*AuthModule](ctx, "auth"))
+			module := &AuditModule{auth: appmodule.MustContextGet[*AuthModule](ctx, "auth")}
+			auditModule, err := audit.New(audit.Options{
+				DB:              ctx.DB(),
+				AdminAuthorizer: module.authorizer(),
+			})
+			if err != nil {
+				return nil, err
+			}
+			module.value = auditModule
+			return module, nil
 		},
 	}
-}
-
-func newAuditModule(ctx context.Context, db *bun.DB, authModule *AuthModule) (*AuditModule, error) {
-	module := &AuditModule{auth: authModule}
-	auditModule, err := audit.New(audit.Options{
-		DB:              db,
-		AdminAuthorizer: module.authorizer(),
-	})
-	if err != nil {
-		return nil, err
-	}
-	module.value = auditModule
-	return module, nil
 }
 
 func (m *AuditModule) Name() string {

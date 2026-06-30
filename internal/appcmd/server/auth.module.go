@@ -28,23 +28,19 @@ func NewAuthSpec(cfg *config.Config) appmodule.Spec {
 		Name:        module.Name(),
 		ApplySchema: module.ApplySchema,
 		Build: func(ctx *appmodule.Context) (appmodule.Module, error) {
-			return newAuthModule(ctx.Context(), ctx.DB(), cfg)
+			module := &AuthModule{cfg: cfg}
+			authModule, err := auth.New(auth.Options{
+				DB:         ctx.DB(),
+				Config:     module.config(),
+				SessionTTL: cfg.Server.Auth.Session.TTL,
+			})
+			if err != nil {
+				return nil, err
+			}
+			module.value = authModule
+			return module, nil
 		},
 	}
-}
-
-func newAuthModule(ctx context.Context, db *bun.DB, cfg *config.Config) (*AuthModule, error) {
-	module := &AuthModule{cfg: cfg}
-	authModule, err := auth.New(auth.Options{
-		DB:         db,
-		Config:     module.config(),
-		SessionTTL: cfg.Server.Auth.Session.TTL,
-	})
-	if err != nil {
-		return nil, err
-	}
-	module.value = authModule
-	return module, nil
 }
 
 func (m *AuthModule) Name() string {

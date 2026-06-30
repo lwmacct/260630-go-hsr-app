@@ -30,22 +30,21 @@ func NewOauthSpec(cfg *config.Config) appmodule.Spec {
 		Requires:    []string{"auth"},
 		ApplySchema: module.ApplySchema,
 		Build: func(ctx *appmodule.Context) (appmodule.Module, error) {
-			return newOauthModule(ctx.Context(), ctx.DB(), cfg, appmodule.MustContextGet[*AuthModule](ctx, "auth"))
+			module := &OauthModule{
+				cfg:      cfg,
+				identity: appmodule.MustContextGet[*AuthModule](ctx, "auth"),
+			}
+			oauthModule, err := oauth.New(oauth.Options{
+				DB:     ctx.DB(),
+				Config: module.config(),
+			})
+			if err != nil {
+				return nil, err
+			}
+			module.value = oauthModule
+			return module, nil
 		},
 	}
-}
-
-func newOauthModule(ctx context.Context, db *bun.DB, cfg *config.Config, identity oauth.Identity) (*OauthModule, error) {
-	module := &OauthModule{cfg: cfg, identity: identity}
-	oauthModule, err := oauth.New(oauth.Options{
-		DB:     db,
-		Config: module.config(),
-	})
-	if err != nil {
-		return nil, err
-	}
-	module.value = oauthModule
-	return module, nil
 }
 
 func (m *OauthModule) Name() string {
