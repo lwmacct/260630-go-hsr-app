@@ -3,10 +3,12 @@ module github.com/lwmacct/260630-go-hsr-app
 go 1.26.4
 
 require (
+	github.com/danielgtaylor/huma/v2 v2.38.0
 	github.com/lwmacct/251207-go-pkg-cfgm v0.22.260625
 	github.com/lwmacct/251207-go-pkg-version v0.4.260630
 	github.com/lwmacct/251219-go-pkg-logm v0.9.260413
 	github.com/lwmacct/260614-go-pkg-tlsreload v0.12.260630
+	github.com/lwmacct/260630-go-hsr-audit v0.4.260630
 	github.com/lwmacct/260630-go-hsr-auth v0.3.260630
 	github.com/lwmacct/260630-go-hsr-shared v0.2.260630
 	github.com/uptrace/bun v1.2.18
@@ -16,7 +18,6 @@ require (
 require (
 	github.com/1password/onepassword-sdk-go v0.4.0 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
-	github.com/danielgtaylor/huma/v2 v2.38.0 // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
 	github.com/dylibso/observe-sdk/go v0.0.0-20240828172851-9145d8ad07e1 // indirect
 	github.com/extism/go-sdk v1.7.1 // indirect

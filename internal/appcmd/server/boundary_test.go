@@ -9,12 +9,18 @@ import (
 	"testing"
 )
 
-func TestFinalAppUsesAuthPublicPackageOnly(t *testing.T) {
+func TestFinalAppUsesModulePublicPackagesOnly(t *testing.T) {
 	root := projectRoot(t)
+	internalPrefixes := []string{
+		"github.com/lwmacct/260630-go-hsr-auth/internal/",
+		"github.com/lwmacct/260630-go-hsr-audit/internal/",
+	}
 	for _, file := range goFiles(t, root) {
 		for _, importPath := range importsInFile(t, file) {
-			if strings.HasPrefix(importPath, "github.com/lwmacct/260630-go-hsr-auth/internal/") {
-				t.Fatalf("final app must not import auth internals: %s imports %s", file, importPath)
+			for _, prefix := range internalPrefixes {
+				if strings.HasPrefix(importPath, prefix) {
+					t.Fatalf("final app must not import module internals: %s imports %s", file, importPath)
+				}
 			}
 		}
 	}
