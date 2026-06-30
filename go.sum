@@ -54,8 +54,8 @@ github.com/lwmacct/260630-go-hsr-auth v0.6.260630 h1:QhESMjNB3PGBb9iaJamHrF17jSC
 github.com/lwmacct/260630-go-hsr-auth v0.6.260630/go.mod h1:S/d/WDp9OVyH4CjsyP4LvujHvujix5zOwVOZnrpYLoE=
 github.com/lwmacct/260630-go-hsr-oauth v0.5.260630 h1:0aFwu1ZSsNyDOkTLRlTgYSEFZ3mnvpWRN5PEak7jAIA=
 github.com/lwmacct/260630-go-hsr-oauth v0.5.260630/go.mod h1:H7b8jqseEqM3/WLfMUnONOo7YDhQSQ/qDCx+Gqo3TYA=
-github.com/lwmacct/260630-go-hsr-shared v0.7.260630 h1:VZxh3XTwDPlIxiBMlwQcPhqQJC3hwLynwHa3LAuPK5Y=
-github.com/lwmacct/260630-go-hsr-shared v0.7.260630/go.mod h1:JevRACq1cDd6oZDX4pN1ncffmeoM/d6YXN271dJB5Cc=
+github.com/lwmacct/260630-go-hsr-shared v0.8.260630 h1:6qpiUp4vkia2EF4njFT9KI155PB9bSe9ZpjPlI6klOU=
+github.com/lwmacct/260630-go-hsr-shared v0.8.260630/go.mod h1:JevRACq1cDd6oZDX4pN1ncffmeoM/d6YXN271dJB5Cc=
 github.com/mattn/go-isatty v0.0.21 h1:xYae+lCNBP7QuW4PUnNG61ffM4hVIfm+zUzDuSzYLGs=
 github.com/mattn/go-isatty v0.0.21/go.mod h1:ZXfXG4SQHsB/w3ZeOYbR0PrPwLy+n6xiMrJlRFqopa4=
 github.com/mattn/go-sqlite3 v1.14.34 h1:3NtcvcUnFBPsuRcno8pUtupspG/GM+9nZ88zgJcp6Zk=

@@ -8,7 +8,6 @@ import (
 	"github.com/lwmacct/260630-go-hsr-audit/pkg/audit"
 	"github.com/lwmacct/260630-go-hsr-auth/pkg/auth"
 	"github.com/lwmacct/260630-go-hsr-shared/pkg/appmodule"
-	"github.com/uptrace/bun"
 )
 
 var errAuditUnauthorized = errors.New("audit unauthorized")
@@ -19,14 +18,13 @@ type AuditModule struct {
 }
 
 var _ appmodule.Module = (*AuditModule)(nil)
-var _ appmodule.SchemaApplier = (*AuditModule)(nil)
 
 func NewAuditSpec() appmodule.Spec {
 	module := &AuditModule{}
 	return appmodule.Spec{
-		Name:        module.Name(),
-		Requires:    []string{"auth"},
-		ApplySchema: module.ApplySchema,
+		Name:     module.Name(),
+		Requires: []string{"auth"},
+		Schema:   audit.ApplySchema,
 		Build: func(ctx *appmodule.Context) (appmodule.Module, error) {
 			module := &AuditModule{auth: appmodule.MustContextGet[*AuthModule](ctx, "auth")}
 			auditModule, err := audit.New(audit.Options{
@@ -44,10 +42,6 @@ func NewAuditSpec() appmodule.Spec {
 
 func (m *AuditModule) Name() string {
 	return "audit"
-}
-
-func (m *AuditModule) ApplySchema(ctx context.Context, db *bun.DB) error {
-	return audit.ApplySchema(ctx, db)
 }
 
 func (m *AuditModule) Register(api huma.API) {

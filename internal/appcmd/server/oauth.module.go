@@ -1,7 +1,6 @@
 package server
 
 import (
-	"context"
 	"errors"
 	"strings"
 
@@ -9,7 +8,6 @@ import (
 	"github.com/lwmacct/260630-go-hsr-auth/pkg/auth"
 	"github.com/lwmacct/260630-go-hsr-oauth/pkg/oauth"
 	"github.com/lwmacct/260630-go-hsr-shared/pkg/appmodule"
-	"github.com/uptrace/bun"
 
 	"github.com/lwmacct/260630-go-hsr-app/internal/config"
 )
@@ -21,14 +19,13 @@ type OauthModule struct {
 }
 
 var _ appmodule.Module = (*OauthModule)(nil)
-var _ appmodule.SchemaApplier = (*OauthModule)(nil)
 
 func NewOauthSpec(cfg *config.Config) appmodule.Spec {
 	module := &OauthModule{cfg: cfg}
 	return appmodule.Spec{
-		Name:        module.Name(),
-		Requires:    []string{"auth"},
-		ApplySchema: module.ApplySchema,
+		Name:     module.Name(),
+		Requires: []string{"auth"},
+		Schema:   oauth.ApplySchema,
 		Build: func(ctx *appmodule.Context) (appmodule.Module, error) {
 			module := &OauthModule{
 				cfg:      cfg,
@@ -49,10 +46,6 @@ func NewOauthSpec(cfg *config.Config) appmodule.Spec {
 
 func (m *OauthModule) Name() string {
 	return "oauth"
-}
-
-func (m *OauthModule) ApplySchema(ctx context.Context, db *bun.DB) error {
-	return oauth.ApplySchema(ctx, db)
 }
 
 func (m *OauthModule) Register(api huma.API) {

@@ -11,7 +11,7 @@ require (
 	github.com/lwmacct/260630-go-hsr-audit v0.4.260630
 	github.com/lwmacct/260630-go-hsr-auth v0.6.260630
 	github.com/lwmacct/260630-go-hsr-oauth v0.5.260630
-	github.com/lwmacct/260630-go-hsr-shared v0.7.260630
+	github.com/lwmacct/260630-go-hsr-shared v0.8.260630
 	github.com/uptrace/bun v1.2.18
 	github.com/urfave/cli/v3 v3.10.1
 )

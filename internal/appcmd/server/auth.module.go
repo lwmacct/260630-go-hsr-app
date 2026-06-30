@@ -8,7 +8,6 @@ import (
 	"github.com/lwmacct/260630-go-hsr-oauth/pkg/oauth"
 	"github.com/lwmacct/260630-go-hsr-shared/pkg/appmodule"
 	"github.com/lwmacct/260630-go-hsr-shared/pkg/challenge"
-	"github.com/uptrace/bun"
 
 	"github.com/lwmacct/260630-go-hsr-app/internal/config"
 )
@@ -19,14 +18,13 @@ type AuthModule struct {
 }
 
 var _ appmodule.Module = (*AuthModule)(nil)
-var _ appmodule.SchemaApplier = (*AuthModule)(nil)
 var _ oauth.Identity = (*AuthModule)(nil)
 
 func NewAuthSpec(cfg *config.Config) appmodule.Spec {
 	module := &AuthModule{cfg: cfg}
 	return appmodule.Spec{
-		Name:        module.Name(),
-		ApplySchema: module.ApplySchema,
+		Name:   module.Name(),
+		Schema: auth.ApplySchema,
 		Build: func(ctx *appmodule.Context) (appmodule.Module, error) {
 			module := &AuthModule{cfg: cfg}
 			authModule, err := auth.New(auth.Options{
@@ -45,10 +43,6 @@ func NewAuthSpec(cfg *config.Config) appmodule.Spec {
 
 func (m *AuthModule) Name() string {
 	return "auth"
-}
-
-func (m *AuthModule) ApplySchema(ctx context.Context, db *bun.DB) error {
-	return auth.ApplySchema(ctx, db)
 }
 
 func (m *AuthModule) Register(api huma.API) {

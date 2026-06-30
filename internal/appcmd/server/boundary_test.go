@@ -28,7 +28,7 @@ func TestFinalAppUsesModulePublicPackagesOnly(t *testing.T) {
 	}
 }
 
-func TestServerModuleFilesDefineOneModuleStruct(t *testing.T) {
+func TestServerModuleFilesFollowSpecShape(t *testing.T) {
 	root := projectRoot(t)
 	files, err := filepath.Glob(filepath.Join(root, "internal", "appcmd", "server", "*.module.go"))
 	if err != nil {
@@ -47,6 +47,21 @@ func TestServerModuleFilesDefineOneModuleStruct(t *testing.T) {
 		}
 		if len(modules) != 1 {
 			t.Fatalf("%s must define exactly one *Module struct, got %v", file, modules)
+		}
+		funcs := funcsInFile(t, file)
+		specFunc := "New" + strings.TrimSuffix(modules[0], "Module") + "Spec"
+		if funcs.packageFuncs[specFunc] != "appmodule.Spec" {
+			t.Fatalf("%s must define %s returning appmodule.Spec, got %q", file, specFunc, funcs.packageFuncs[specFunc])
+		}
+		for name := range funcs.packageFuncs {
+			if name != specFunc {
+				t.Fatalf("%s must not define package helper %s in module file", file, name)
+			}
+		}
+		for _, name := range funcs.receiverFuncs {
+			if name == "ApplySchema" {
+				t.Fatalf("%s must keep schema on appmodule.Spec, not %s receiver method", file, name)
+			}
 		}
 	}
 }
@@ -131,4 +146,52 @@ func structNamesInFile(t *testing.T, file string) []string {
 		return true
 	})
 	return names
+}
+
+type fileFuncs struct {
+	packageFuncs  map[string]string
+	receiverFuncs []string
+}
+
+func funcsInFile(t *testing.T, file string) fileFuncs {
+	t.Helper()
+
+	fset := token.NewFileSet()
+	parsed, err := parser.ParseFile(fset, file, nil, 0)
+	if err != nil {
+		t.Fatal(err)
+	}
+	result := fileFuncs{packageFuncs: map[string]string{}}
+	for _, decl := range parsed.Decls {
+		fn, ok := decl.(*ast.FuncDecl)
+		if !ok {
+			continue
+		}
+		if fn.Recv != nil {
+			result.receiverFuncs = append(result.receiverFuncs, fn.Name.Name)
+			continue
+		}
+		result.packageFuncs[fn.Name.Name] = funcResultName(fn)
+	}
+	return result
+}
+
+func funcResultName(fn *ast.FuncDecl) string {
+	if fn.Type.Results == nil || len(fn.Type.Results.List) != 1 {
+		return ""
+	}
+	return exprName(fn.Type.Results.List[0].Type)
+}
+
+func exprName(expr ast.Expr) string {
+	switch value := expr.(type) {
+	case *ast.SelectorExpr:
+		return exprName(value.X) + "." + value.Sel.Name
+	case *ast.Ident:
+		return value.Name
+	case *ast.StarExpr:
+		return "*" + exprName(value.X)
+	default:
+		return ""
+	}
 }
