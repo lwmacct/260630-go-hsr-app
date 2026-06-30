@@ -11,7 +11,7 @@ import (
 	"github.com/lwmacct/251207-go-pkg-version/pkg/version"
 	"github.com/lwmacct/251219-go-pkg-logm/pkg/logm"
 
-	"github.com/lwmacct/260630-go-hsr-final/internal/appcmd/server"
+	"github.com/lwmacct/260630-go-hsr-app/internal/appcmd/server"
 )
 
 func main() {

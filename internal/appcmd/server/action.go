@@ -7,7 +7,7 @@ import (
 
 	"github.com/lwmacct/251207-go-pkg-cfgm/pkg/cfgm"
 
-	"github.com/lwmacct/260630-go-hsr-final/internal/config"
+	"github.com/lwmacct/260630-go-hsr-app/internal/config"
 )
 
 func action(ctx context.Context, cmd *cli.Command) error {

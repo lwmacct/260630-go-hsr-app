@@ -1,4 +1,4 @@
-module github.com/lwmacct/260630-go-hsr-final
+module github.com/lwmacct/260630-go-hsr-app
 
 go 1.26.4
 

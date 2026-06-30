@@ -12,7 +12,7 @@ import (
 	"github.com/lwmacct/260630-go-hsr-shared/pkg/requestctx"
 	"github.com/uptrace/bun"
 
-	"github.com/lwmacct/260630-go-hsr-final/internal/config"
+	"github.com/lwmacct/260630-go-hsr-app/internal/config"
 )
 
 type dependencies struct {

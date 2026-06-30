@@ -11,7 +11,7 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/lwmacct/260630-go-hsr-final/internal/config"
+	"github.com/lwmacct/260630-go-hsr-app/internal/config"
 )
 
 func run(ctx context.Context, cfg *config.Config) error {

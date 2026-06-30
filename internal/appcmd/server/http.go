@@ -6,7 +6,7 @@ import (
 
 	"github.com/lwmacct/260630-go-hsr-shared/pkg/httpserver"
 
-	"github.com/lwmacct/260630-go-hsr-final/internal/config"
+	"github.com/lwmacct/260630-go-hsr-app/internal/config"
 )
 
 const httpAPIPrefix = "/api"

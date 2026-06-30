@@ -6,7 +6,7 @@ import (
 
 	"github.com/lwmacct/260630-go-hsr-auth/pkg/auth"
 
-	"github.com/lwmacct/260630-go-hsr-final/internal/config"
+	"github.com/lwmacct/260630-go-hsr-app/internal/config"
 )
 
 func newAuthConfig(cfg *config.Config) auth.Config {
