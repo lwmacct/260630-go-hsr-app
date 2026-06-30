@@ -14,6 +14,7 @@ func TestFinalAppUsesModulePublicPackagesOnly(t *testing.T) {
 	internalPrefixes := []string{
 		"github.com/lwmacct/260630-go-hsr-auth/internal/",
 		"github.com/lwmacct/260630-go-hsr-audit/internal/",
+		"github.com/lwmacct/260630-go-hsr-oauth/internal/",
 	}
 	for _, file := range goFiles(t, root) {
 		for _, importPath := range importsInFile(t, file) {

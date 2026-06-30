@@ -10,7 +10,7 @@ require (
 	github.com/lwmacct/260614-go-pkg-tlsreload v0.12.260630
 	github.com/lwmacct/260630-go-hsr-audit v0.4.260630
 	github.com/lwmacct/260630-go-hsr-auth v0.6.260630
-	github.com/lwmacct/260630-go-hsr-oauth v0.3.260630
+	github.com/lwmacct/260630-go-hsr-oauth v0.4.260630
 	github.com/lwmacct/260630-go-hsr-shared v0.4.260630
 	github.com/uptrace/bun v1.2.18
 	github.com/urfave/cli/v3 v3.10.1
