@@ -19,10 +19,32 @@ type AuthModule struct {
 }
 
 var _ appmodule.Module = (*AuthModule)(nil)
+var _ appmodule.SchemaApplier = (*AuthModule)(nil)
 var _ oauth.Identity = (*AuthModule)(nil)
 
-func NewAuthModule(cfg *config.Config) *AuthModule {
-	return &AuthModule{cfg: cfg}
+func NewAuthSpec(cfg *config.Config) appmodule.Spec {
+	module := &AuthModule{cfg: cfg}
+	return appmodule.Spec{
+		Name:        module.Name(),
+		ApplySchema: module.ApplySchema,
+		Build: func(ctx *appmodule.Context) (appmodule.Module, error) {
+			return newAuthModule(ctx.Context(), ctx.DB(), cfg)
+		},
+	}
+}
+
+func newAuthModule(ctx context.Context, db *bun.DB, cfg *config.Config) (*AuthModule, error) {
+	module := &AuthModule{cfg: cfg}
+	authModule, err := auth.New(auth.Options{
+		DB:         db,
+		Config:     module.config(),
+		SessionTTL: cfg.Server.Auth.Session.TTL,
+	})
+	if err != nil {
+		return nil, err
+	}
+	module.value = authModule
+	return module, nil
 }
 
 func (m *AuthModule) Name() string {
@@ -31,19 +53,6 @@ func (m *AuthModule) Name() string {
 
 func (m *AuthModule) ApplySchema(ctx context.Context, db *bun.DB) error {
 	return auth.ApplySchema(ctx, db)
-}
-
-func (m *AuthModule) Init(ctx context.Context, db *bun.DB) error {
-	module, err := auth.New(auth.Options{
-		DB:         db,
-		Config:     m.config(),
-		SessionTTL: m.cfg.Server.Auth.Session.TTL,
-	})
-	if err != nil {
-		return err
-	}
-	m.value = module
-	return nil
 }
 
 func (m *AuthModule) Register(api huma.API) {

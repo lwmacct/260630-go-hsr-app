@@ -17,7 +17,7 @@ import (
 
 type dependencies struct {
 	db       *bun.DB
-	modules  []appmodule.Module
+	modules  *appmodule.Runtime
 	auth     *AuthModule
 	oauth    *OauthModule
 	audit    *AuditModule
@@ -51,18 +51,18 @@ func newDependenciesWithoutTLS(ctx context.Context, cfg *config.Config) (*depend
 		return nil, fmt.Errorf("open database: %w", err)
 	}
 
-	authModule := NewAuthModule(cfg)
-	oauthModule := NewOauthModule(cfg, authModule)
-	auditModule := NewAuditModule(authModule)
-	modules := []appmodule.Module{authModule, oauthModule, auditModule}
-	if err := appmodule.ApplySchemas(ctx, db, modules...); err != nil {
+	modules, err := appmodule.Build(ctx, db,
+		NewAuthSpec(cfg),
+		NewOauthSpec(cfg),
+		NewAuditSpec(),
+	)
+	if err != nil {
 		_ = db.Close()
 		return nil, err
 	}
-	if err := appmodule.Init(ctx, db, modules...); err != nil {
-		_ = db.Close()
-		return nil, err
-	}
+	authModule := appmodule.MustGet[*AuthModule](modules, "auth")
+	oauthModule := appmodule.MustGet[*OauthModule](modules, "oauth")
+	auditModule := appmodule.MustGet[*AuditModule](modules, "audit")
 	return &dependencies{
 		db:       db,
 		modules:  modules,
@@ -81,6 +81,10 @@ func (d *dependencies) Close() {
 		d.tls.Close()
 		d.tls = nil
 	}
+	if d.modules != nil {
+		_ = d.modules.Close()
+		d.modules = nil
+	}
 	if d.db != nil {
 		_ = d.db.Close()
 		d.db = nil
@@ -88,7 +92,6 @@ func (d *dependencies) Close() {
 	d.auth = nil
 	d.oauth = nil
 	d.audit = nil
-	d.modules = nil
 }
 
 func databaseConfig(cfg config.ServerDatabase) database.Config {

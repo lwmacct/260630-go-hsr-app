@@ -21,9 +21,31 @@ type OauthModule struct {
 }
 
 var _ appmodule.Module = (*OauthModule)(nil)
+var _ appmodule.SchemaApplier = (*OauthModule)(nil)
 
-func NewOauthModule(cfg *config.Config, identity oauth.Identity) *OauthModule {
-	return &OauthModule{cfg: cfg, identity: identity}
+func NewOauthSpec(cfg *config.Config) appmodule.Spec {
+	module := &OauthModule{cfg: cfg}
+	return appmodule.Spec{
+		Name:        module.Name(),
+		Requires:    []string{"auth"},
+		ApplySchema: module.ApplySchema,
+		Build: func(ctx *appmodule.Context) (appmodule.Module, error) {
+			return newOauthModule(ctx.Context(), ctx.DB(), cfg, appmodule.MustContextGet[*AuthModule](ctx, "auth"))
+		},
+	}
+}
+
+func newOauthModule(ctx context.Context, db *bun.DB, cfg *config.Config, identity oauth.Identity) (*OauthModule, error) {
+	module := &OauthModule{cfg: cfg, identity: identity}
+	oauthModule, err := oauth.New(oauth.Options{
+		DB:     db,
+		Config: module.config(),
+	})
+	if err != nil {
+		return nil, err
+	}
+	module.value = oauthModule
+	return module, nil
 }
 
 func (m *OauthModule) Name() string {
@@ -32,18 +54,6 @@ func (m *OauthModule) Name() string {
 
 func (m *OauthModule) ApplySchema(ctx context.Context, db *bun.DB) error {
 	return oauth.ApplySchema(ctx, db)
-}
-
-func (m *OauthModule) Init(ctx context.Context, db *bun.DB) error {
-	module, err := oauth.New(oauth.Options{
-		DB:     db,
-		Config: m.config(),
-	})
-	if err != nil {
-		return err
-	}
-	m.value = module
-	return nil
 }
 
 func (m *OauthModule) Register(api huma.API) {

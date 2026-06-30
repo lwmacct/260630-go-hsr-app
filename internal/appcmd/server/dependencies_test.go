@@ -8,6 +8,8 @@ import (
 
 	"github.com/lwmacct/260630-go-hsr-app/internal/config"
 	"github.com/lwmacct/260630-go-hsr-auth/pkg/auth"
+	"github.com/lwmacct/260630-go-hsr-shared/pkg/appmodule"
+	"github.com/lwmacct/260630-go-hsr-shared/pkg/database"
 	"github.com/uptrace/bun"
 )
 
@@ -47,6 +49,40 @@ func TestNewHTTPAPIHandlerRegistersAllModules(t *testing.T) {
 	handler := newHTTPAPIHandler(&cfg, deps)
 	if handler == nil {
 		t.Fatal("api handler is nil")
+	}
+}
+
+func TestModuleRuntimeBuildsOutOfOrderSpecs(t *testing.T) {
+	cfg := config.DefaultConfig()
+	cfg.Server.Database.SQLite = "file:module-runtime-order-test?mode=memory&cache=shared"
+	cfg.Server.HTTP.WebRoot = ""
+	db, err := database.Open(context.Background(), databaseConfig(cfg.Server.Database))
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer func() { _ = db.Close() }()
+
+	runtime, err := appmodule.Build(context.Background(), db,
+		NewOauthSpec(&cfg),
+		NewAuthSpec(&cfg),
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer func() { _ = runtime.Close() }()
+	if _, ok := appmodule.Get[*AuthModule](runtime, "auth"); !ok {
+		t.Fatal("auth module missing")
+	}
+	if _, ok := appmodule.Get[*OauthModule](runtime, "oauth"); !ok {
+		t.Fatal("oauth module missing")
+	}
+}
+
+func TestModuleRuntimeRejectsMissingDependency(t *testing.T) {
+	cfg := config.DefaultConfig()
+	_, err := appmodule.Build(context.Background(), nil, NewOauthSpec(&cfg))
+	if err == nil || !strings.Contains(err.Error(), "requires missing module auth") {
+		t.Fatalf("unexpected error: %v", err)
 	}
 }
 

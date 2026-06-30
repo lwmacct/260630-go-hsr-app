@@ -19,9 +19,31 @@ type AuditModule struct {
 }
 
 var _ appmodule.Module = (*AuditModule)(nil)
+var _ appmodule.SchemaApplier = (*AuditModule)(nil)
 
-func NewAuditModule(authModule *AuthModule) *AuditModule {
-	return &AuditModule{auth: authModule}
+func NewAuditSpec() appmodule.Spec {
+	module := &AuditModule{}
+	return appmodule.Spec{
+		Name:        module.Name(),
+		Requires:    []string{"auth"},
+		ApplySchema: module.ApplySchema,
+		Build: func(ctx *appmodule.Context) (appmodule.Module, error) {
+			return newAuditModule(ctx.Context(), ctx.DB(), appmodule.MustContextGet[*AuthModule](ctx, "auth"))
+		},
+	}
+}
+
+func newAuditModule(ctx context.Context, db *bun.DB, authModule *AuthModule) (*AuditModule, error) {
+	module := &AuditModule{auth: authModule}
+	auditModule, err := audit.New(audit.Options{
+		DB:              db,
+		AdminAuthorizer: module.authorizer(),
+	})
+	if err != nil {
+		return nil, err
+	}
+	module.value = auditModule
+	return module, nil
 }
 
 func (m *AuditModule) Name() string {
@@ -30,18 +52,6 @@ func (m *AuditModule) Name() string {
 
 func (m *AuditModule) ApplySchema(ctx context.Context, db *bun.DB) error {
 	return audit.ApplySchema(ctx, db)
-}
-
-func (m *AuditModule) Init(ctx context.Context, db *bun.DB) error {
-	module, err := audit.New(audit.Options{
-		DB:              db,
-		AdminAuthorizer: m.authorizer(),
-	})
-	if err != nil {
-		return err
-	}
-	m.value = module
-	return nil
 }
 
 func (m *AuditModule) Register(api huma.API) {

@@ -6,7 +6,6 @@ import (
 
 	"github.com/danielgtaylor/huma/v2"
 	"github.com/danielgtaylor/huma/v2/adapters/humago"
-	"github.com/lwmacct/260630-go-hsr-shared/pkg/appmodule"
 	"github.com/lwmacct/260630-go-hsr-shared/pkg/httpserver"
 
 	"github.com/lwmacct/260630-go-hsr-app/internal/config"
@@ -51,7 +50,7 @@ func newHTTPAPIHandler(cfg *config.Config, deps *dependencies) http.Handler {
 	}
 	mux := http.NewServeMux()
 	api := humago.New(mux, httpAPIConfig())
-	appmodule.Register(api, deps.modules...)
+	deps.modules.Register(api)
 	return httpserver.LimitRequestBody(mux, maxBodyBytes)
 }
 
