@@ -9,7 +9,8 @@ require (
 	github.com/lwmacct/251219-go-pkg-logm v0.9.260413
 	github.com/lwmacct/260614-go-pkg-tlsreload v0.12.260630
 	github.com/lwmacct/260630-go-hsr-audit v0.4.260630
-	github.com/lwmacct/260630-go-hsr-auth v0.5.260630
+	github.com/lwmacct/260630-go-hsr-auth v0.6.260630
+	github.com/lwmacct/260630-go-hsr-oauth v0.2.260630
 	github.com/lwmacct/260630-go-hsr-shared v0.4.260630
 	github.com/uptrace/bun v1.2.18
 	github.com/urfave/cli/v3 v3.10.1
@@ -49,7 +50,7 @@ require (
 	go.yaml.in/yaml/v3 v3.0.4 // indirect
 	golang.org/x/crypto v0.53.0 // indirect
 	golang.org/x/exp v0.0.0-20260218203240-3dfff04db8fa // indirect
-	golang.org/x/image v0.23.0 // indirect
+	golang.org/x/image v0.43.0 // indirect
 	golang.org/x/mod v0.37.0 // indirect
 	golang.org/x/sys v0.46.0 // indirect
 	google.golang.org/protobuf v1.36.11 // indirect

@@ -51,6 +51,7 @@ func newHTTPAPIHandler(cfg *config.Config, deps *dependencies) http.Handler {
 	mux := http.NewServeMux()
 	api := humago.New(mux, httpAPIConfig())
 	deps.auth.Register(api)
+	deps.oauth.Register(api)
 	deps.audit.Register(api)
 	return httpserver.LimitRequestBody(mux, maxBodyBytes)
 }

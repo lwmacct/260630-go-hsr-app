@@ -9,6 +9,7 @@ import (
 	"github.com/lwmacct/260614-go-pkg-tlsreload/pkg/tlsreload"
 	"github.com/lwmacct/260630-go-hsr-audit/pkg/audit"
 	"github.com/lwmacct/260630-go-hsr-auth/pkg/auth"
+	"github.com/lwmacct/260630-go-hsr-oauth/pkg/oauth"
 	"github.com/lwmacct/260630-go-hsr-shared/pkg/database"
 	"github.com/lwmacct/260630-go-hsr-shared/pkg/requestctx"
 	"github.com/uptrace/bun"
@@ -19,6 +20,7 @@ import (
 type dependencies struct {
 	db       *bun.DB
 	auth     *auth.Module
+	oauth    *oauth.Module
 	audit    *audit.Module
 	requests requestctx.Middleware
 	tls      *tlsreload.Manager
@@ -53,6 +55,10 @@ func newDependenciesWithoutTLS(ctx context.Context, cfg *config.Config) (*depend
 		_ = db.Close()
 		return nil, fmt.Errorf("apply auth schema: %w", err)
 	}
+	if err := oauth.ApplySchema(ctx, db); err != nil {
+		_ = db.Close()
+		return nil, fmt.Errorf("apply oauth schema: %w", err)
+	}
 	if err := audit.ApplySchema(ctx, db); err != nil {
 		_ = db.Close()
 		return nil, fmt.Errorf("apply audit schema: %w", err)
@@ -67,6 +73,14 @@ func newDependenciesWithoutTLS(ctx context.Context, cfg *config.Config) (*depend
 		_ = db.Close()
 		return nil, fmt.Errorf("configure auth module: %w", err)
 	}
+	oauthModule, err := oauth.New(oauth.Options{
+		DB:     db,
+		Config: newOAuthConfig(cfg, authModule),
+	})
+	if err != nil {
+		_ = db.Close()
+		return nil, fmt.Errorf("configure oauth module: %w", err)
+	}
 	auditModule, err := audit.New(audit.Options{
 		DB:              db,
 		AdminAuthorizer: newAuditAuthorizer(authModule),
@@ -78,6 +92,7 @@ func newDependenciesWithoutTLS(ctx context.Context, cfg *config.Config) (*depend
 	return &dependencies{
 		db:       db,
 		auth:     authModule,
+		oauth:    oauthModule,
 		audit:    auditModule,
 		requests: requestctx.NewMiddleware(cfg.Server.HTTP.TrustedProxies),
 	}, nil
@@ -96,6 +111,7 @@ func (d *dependencies) Close() {
 		d.db = nil
 	}
 	d.auth = nil
+	d.oauth = nil
 	d.audit = nil
 }
 

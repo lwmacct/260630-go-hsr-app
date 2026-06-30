@@ -33,6 +33,11 @@ export interface AuthPublicConfig {
   challenge: AuthChallengeConfig;
 }
 
+export interface OAuthPublicConfig {
+  enabled: boolean;
+  providers: OAuthProvider[];
+}
+
 export interface OAuthProvider {
   provider: string;
   label: string;
@@ -74,15 +79,43 @@ export async function fetchAuthSession(): Promise<AuthSession> {
 }
 
 export async function fetchAuthPublicConfig(): Promise<AuthPublicConfig> {
+  const [authConfig, oauthConfig] = await Promise.all([
+    fetchAuthCoreConfig(),
+    fetchOAuthPublicConfig(),
+  ]);
+
+  if (!authConfig) {
+    return defaultAuthConfig;
+  }
+
+  return {
+    ...authConfig,
+    oauth: oauthConfig ?? defaultAuthConfig.oauth,
+  };
+}
+
+async function fetchAuthCoreConfig(): Promise<Omit<AuthPublicConfig, "oauth"> | null> {
   const response = await fetch("/api/auth/config", {
     credentials: "same-origin",
   });
 
   if (!response.ok) {
-    return defaultAuthConfig;
+    return null;
   }
 
-  return (await response.json()) as AuthPublicConfig;
+  return (await response.json()) as Omit<AuthPublicConfig, "oauth">;
+}
+
+async function fetchOAuthPublicConfig(): Promise<OAuthPublicConfig | null> {
+  const response = await fetch("/api/auth/oauth/config", {
+    credentials: "same-origin",
+  });
+
+  if (!response.ok) {
+    return null;
+  }
+
+  return (await response.json()) as OAuthPublicConfig;
 }
 
 export async function fetchAuthState(): Promise<AuthState> {
