@@ -52,8 +52,8 @@ github.com/lwmacct/260630-go-hsr-audit v0.4.260630 h1:bnKgpOpQYK3RhzegAeuwA9vdVp
 github.com/lwmacct/260630-go-hsr-audit v0.4.260630/go.mod h1:njaA7myTH3SeJUKV7S5CqGZZkxcMmyHh9oPU7xsYOO8=
 github.com/lwmacct/260630-go-hsr-auth v0.6.260630 h1:QhESMjNB3PGBb9iaJamHrF17jSCSGlVMIA/PDTS8IFw=
 github.com/lwmacct/260630-go-hsr-auth v0.6.260630/go.mod h1:S/d/WDp9OVyH4CjsyP4LvujHvujix5zOwVOZnrpYLoE=
-github.com/lwmacct/260630-go-hsr-oauth v0.2.260630 h1:CJ7rXLvnTlBgRh0oche19nSBtXHIUVaCSzx0JA7NTCA=
-github.com/lwmacct/260630-go-hsr-oauth v0.2.260630/go.mod h1:H7b8jqseEqM3/WLfMUnONOo7YDhQSQ/qDCx+Gqo3TYA=
+github.com/lwmacct/260630-go-hsr-oauth v0.3.260630 h1:EuDxze+9z0dKZfFX1CV1XMjNZeXFKZKY0wKvH/4lCUw=
+github.com/lwmacct/260630-go-hsr-oauth v0.3.260630/go.mod h1:H7b8jqseEqM3/WLfMUnONOo7YDhQSQ/qDCx+Gqo3TYA=
 github.com/lwmacct/260630-go-hsr-shared v0.4.260630 h1:CeG+lS/fA1P50ZnMQfkKV60DUa+SD9hgL61+dwmding=
 github.com/lwmacct/260630-go-hsr-shared v0.4.260630/go.mod h1:VcVSXaPNCeZ5v2JPyNGtRp7m+NU8jYISN+vVCqhFrMo=
 github.com/mattn/go-isatty v0.0.21 h1:xYae+lCNBP7QuW4PUnNG61ffM4hVIfm+zUzDuSzYLGs=
